@@ -1,5 +1,5 @@
 ---
-title: "Volume Cropper 0.23.0"
+title: "Volume Cropper 0.23.2"
 subtitle: "What has not been tested yet (27 November 2026)"
 lang: en
 ---
@@ -13,25 +13,19 @@ went, also when it worked.
 
 # Computers
 
-- **Mac:** never run on a real Mac. The environment recipe was only
-  checked to install (a "dry run" for Intel and Apple Silicon Macs, last
-  on 17 November 2026); it needs macOS 11 (Big Sur) or newer.
-- **Linux and BARD:** the window has not been tried on BARD (EMBL's remote
-  desktop) since an early version (0.2); the launcher's drawing set-up
-  (`vgl`, `egl`) was made for BARD but needs a new check. Since 0.21.0
-  the launcher `volume_cropper.sh` no longer changes folder before it
-  starts the tool; that has not been run on Linux or a Mac yet. With
-  0.20.0 the command line ran on the cluster and the notebook on the
-  JupyterHub (22 November 2026); 0.21.0's command
-  (`volume_cropper/core.py`) and the moved notebook have been run on
-  Windows only.
-- **Windows:** used on one PC only.
+(A Mac, BARD and Windows have been tested: see the end.)
+
+- **The cluster and the JupyterHub:** with 0.20.0 the command line ran
+  on the cluster and the notebook on the JupyterHub (22 November 2026);
+  0.21.0's command (`volume_cropper/core.py`) and the moved notebook
+  have been run on Windows only.
 - **Several people** using the shared copy at the same time.
 
 # File formats
 
 - **OME-Zarr 0.6, zipped OME-Zarr (.ozx, .zip), collections** (0.21.0):
-  tested on synthetic images, on images written by
+  zipped OME-Zarr as `.zip` has been tested by people (see the end); the
+  rest was tested on synthetic images, on images written by
   another program (ngff_zarr 0.43) and on two public `.ozx` examples, but
   not yet on real lightsheet data, not on large crops (several GB; the
   ZIP64 format for files over 4 GB was only checked on small files), and
@@ -80,10 +74,8 @@ went, also when it worked.
   synthetic sets only.
 - **Very large files** read into memory (tens of GB): only the memory
   check was tested, not reading such a file.
-- **Fiji opening the TIFFs:** TIFF output was checked by reading it back
-  with Python's TIFF library, and with Fiji on test files during
-  development; not yet by a person on real crops: uncompressed and
-  compressed (Bio-Formats), Fiji TIFF and OME-TIFF, and TIFFs over 4 GB.
+- **Fiji opening the TIFFs:** tested by people (see the end); whether
+  that included TIFFs over 4 GB is not recorded.
 - **Other programs reading the OME-Zarr crops** (Fiji with BigDataViewer
   or n5-viewer, QuPath, Imaris): only napari and Python's OME-Zarr library
   have read them.
@@ -94,17 +86,10 @@ went, also when it worked.
   cropped (0.17.1 review): in time, every 4th timepoint (read back
   identical to the source) and as a moving region (checked by the tool
   only). No real 3D time-lapse yet.
-- **The Autocropper on real data:** tried on synthetic embryos (an embryo
-  demo and a drifting, growing synthetic embryo), and by the maintainer
-  while testing 0.20.0. Not known yet: how well it finds embryos in other
-  people's images, how often it loses one over time, how seeds behave on
-  other tissues.
-- **Splitting touching objects between seeds (0.20.0):** checked on
-  synthetic touching objects (two ellipsoids touching at an angle: each
-  crop kept 99.5 % of its own object and 0.5 % of the other); gap lines
-  and *Recompute split* by the automatic tests and scripted window runs.
-  Not known yet: how it does on real touching embryos of uneven
-  brightness, and how long it takes on large images.
+- **The Autocropper and splitting touching objects between seeds:**
+  tested by people (see the end), and on synthetic objects by the
+  automatic tests and scripted window runs. Not known yet: how long
+  splitting takes on large images.
 - **Outlines per timepoint on large data:** on a small synthetic
   time-lapse (78 MB, 8 timepoints) the fit took 4.5 s instead of 2.8 s and
   the crop took about as long as without outlines. How much slower it is on
@@ -137,9 +122,14 @@ went, also when it worked.
 - **Slow networks:** speeds were measured over Wi-Fi only; a network cable
   is expected to be faster.
 
-# What has been used on real data
+# What has been tested
 
-For comparison: OME-Zarr 0.5 lightsheet images of fixed samples (opening,
+Tested by people (reported by the maintainer, 27 November 2026): the
+tool on a real Mac and on BARD (EMBL's remote desktop), and on Windows
+by two people; zipped OME-Zarr (`.zip`); Fiji opening the TIFF crops;
+the Autocropper, including splitting touching objects between seeds.
+
+Used on real data: OME-Zarr 0.5 lightsheet images of fixed samples (opening,
 crop regions, outlines, crops checked voxel by voxel at several levels), an
 OME-Zarr 0.4 image (crops identical to the source at every level), and LIF
 and CZI files (calibration identical to Fiji's Bio-Formats, and the parts

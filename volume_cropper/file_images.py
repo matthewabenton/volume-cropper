@@ -429,6 +429,16 @@ class TiffReader:
         self._tif.close()
 
 
+def _links_outside(folder: Path, links, resolve=os.path.realpath
+                   ) -> list[str]:
+    """(0.23.2, the pre-publication review) The names of the links among a
+    folder's files that lead outside the folder: on Linux and Mac anyone
+    can make such links, and reading them would read files elsewhere.
+    (`resolve`: for the tests.)"""
+    root = resolve(folder)
+    return [Path(p).name for p in links if not _inside(resolve(p), root)]
+
+
 class TiffSequenceReader:
     """A folder of TIFF files, one image per file (a plane, or a stack),
     in the order of their names (numbers in names sorted as numbers:
@@ -438,11 +448,20 @@ class TiffSequenceReader:
     def __init__(self, folder: str | Path):
         import tifffile
         self.path = Path(folder)
-        files = sorted((p for p in self.path.iterdir()
-                        if p.suffix.lower() in TIFF_SUFFIXES and p.is_file()),
-                       key=lambda p: _natural_key(p.name))
+        with os.scandir(self.path) as entries:   # (knows links at no cost)
+            found = [(Path(e.path), e.is_symlink()) for e in entries
+                     if Path(e.name).suffix.lower() in TIFF_SUFFIXES
+                     and e.is_file()]
+        files = sorted((p for p, _ in found), key=lambda p: _natural_key(p.name))
         if not files:
             raise ValueError(f"{self.path} holds no TIFF files.")
+        outside = _links_outside(self.path, [p for p, link in found if link])
+        if outside:
+            raise ValueError(
+                f"{self.path.name}: {', '.join(sorted(outside)[:3])}"
+                f"{' …' if len(outside) > 3 else ''} lead to files outside "
+                "the folder (links). Volume Cropper reads only the folder's "
+                "own files: a link could point anywhere.")
         self.files = files
         first = TiffReader(files[0])
         try:

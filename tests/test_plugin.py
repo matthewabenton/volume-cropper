@@ -213,6 +213,32 @@ def test_launchers_start_the_window_from_the_users_folder():
     assert done.stdout.startswith("usage: volume_cropper"), done.stdout
 
 
+def test_dropped_name_with_ampersand_runs_nothing():
+    """(0.23.2, the pre-publication review) A name dropped onto the .bat
+    arrives as  cmd.exe /c ""<the .bat>" <name>",  unquoted when it has no
+    space, and cmd.exe runs what follows an "&" in it as a command after
+    the .bat ("ver" here prints the Windows version). The .bat's own end
+    (its :end part, behind a stand-in that only prints what it got) ends
+    that cmd.exe first, so nothing more runs; without it, "ver" runs."""
+    if sys.platform != "win32":
+        return
+    bat = (HERE / "volume_cropper.bat").read_bytes().decode("ascii")
+    end = bat[bat.index("\r\n:end\r\n") + 2:]     # the label, not a "goto :end"
+    assert end.count("\r\n") < 25, "not the .bat's last part"
+    head = '@echo off\r\nsetlocal\r\nset "EXIT_CODE=0"\r\necho got [%*]\r\n'
+    with tempfile.TemporaryDirectory() as tmp:
+        cases = {"with": head + "goto :end\r\n" + end, "without": head}
+        for name, text in cases.items():
+            stand_in = Path(tmp) / f"{name}.bat"
+            stand_in.write_bytes(text.encode("ascii"))
+            run = subprocess.run(
+                f'cmd.exe /d /c ""{stand_in}" img&ver"',
+                capture_output=True, text=True, timeout=60)
+            assert "got [img]" in run.stdout, run.stdout
+            ran = "Microsoft Windows" in run.stdout
+            assert ran == (name == "without"), (name, run.stdout)
+
+
 def test_layers_as_channels_of_one_image():
     data, layers = _layers()
     reader = fi.LayerReader(layers)

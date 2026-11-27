@@ -13,11 +13,10 @@ script then points README.md's links at the new PDF, makes README.pdf again
 (see below), and lists older guide PDFs still in docs/: remove those with
 `git rm`.
 
-The other PDFs, each next to its Markdown (0.17.0; README.pdf and
-BETA_TESTING.pdf since 0.22.0, the user's wish: for colleagues who don't
-read Markdown):
+The other PDFs, each next to its Markdown (0.17.0; README.pdf since
+0.22.0, the user's wish: for colleagues who don't read Markdown):
 
-    python docs/build_user_guide.py README.md docs/BETA_TESTING.md
+    python docs/build_user_guide.py README.md
     python docs/build_user_guide.py docs/PATCH_NOTES.md
     python docs/build_user_guide.py --all       # every PDF listed in SOURCES
     python docs/build_user_guide.py --check     # which PDFs are out of step
@@ -50,11 +49,11 @@ SOURCE = HERE / "USER_GUIDE.md"
 GUIDE_PDF = re.compile(r"USER_GUIDE(_\d+)?\.pdf")   # any guide PDF's name
 README = ROOT / "README.md"
 # Every Markdown file that has a PDF (paths from the tool folder)
-SOURCES = ("docs/USER_GUIDE.md", "README.md", "docs/BETA_TESTING.md",
+SOURCES = ("docs/USER_GUIDE.md", "README.md",
            "docs/PATCH_NOTES.md", "docs/NOT_YET_TESTED.md")
 # (0.22.0) The PDFs kept in step with their Markdown at every change (the
 # test fails otherwise); the others are made again before a release.
-ALWAYS = ("README.md", "docs/BETA_TESTING.md")
+ALWAYS = ("README.md",)       # (BETA_TESTING.md too until 0.23.2)
 # Which Markdown (and its fingerprint) each PDF was made from
 RECORD = HERE / "pdf_sources.json"
 BROWSERS = [

@@ -3,6 +3,45 @@
 The crop code's version is recorded in each crop's provenance
 (`crop_provenance` in its `zarr.json`).
 
+## 0.23.2 (2026-11-27, beta)
+
+The remaining findings of the pre-publication review (the user's "go
+ahead"), each with a test that fails on the code before; the notes for
+beta testers gone; the not-yet-tested list brought up to date. The
+guide's PDF is now `USER_GUIDE_0232.pdf` (one sentence more).
+
+- **Zipped OME-Zarr:** zarr reads each file of a zip whole, so a
+  compressed file that unpacks to many GB (a zip bomb) could fill the
+  memory just by opening the image. A compressed metadata file may
+  unpack to 64 MB, a compressed file of a level's data to twice what
+  one of its shards (or chunks) holds plus 1 MB; anything larger is
+  refused when the image is opened, before it is read. Zips stored
+  uncompressed (RFC-9, and the tool's own) and compressed zips of real
+  images (as Explorer makes them) open as before.
+- **Numbers only:** an OME-Zarr level of any other data type (complex
+  numbers, text, Python objects) is refused when the image is opened.
+- **TIFF folders:** a file that is a link to a file outside the folder
+  is refused (links need no rights on Linux and Mac).
+- **Regions files:** saving regions with outlines per timepoint no
+  longer replaces a file of the JSON's name that the tool did not write
+  (nothing is written then; the message says what to do).
+- **volume_cropper.bat:** a folder whose name holds "&" (and no space),
+  dropped onto the launcher, reaches Windows' cmd.exe unquoted, which
+  ran the rest of the name as a command after the launcher (checked
+  with a stand-in launcher: "img&ver" ran ver). The launcher now ends
+  that cmd.exe itself when it was started by a double-click or a drop;
+  from a terminal it returns to the terminal as before. The name still
+  arrives cut off at the "&" (the guide says to use *Open…* then).
+- **BETA_TESTING.md and .pdf removed** (the user's choice; deleted from
+  the public repository first): the README no longer links them,
+  `build_user_guide.py` and `tests/test_docs.py` no longer list them.
+- **NOT_YET_TESTED:** tested by people, as the maintainer reports: a
+  real Mac, BARD, Windows by two people, zipped OME-Zarr (.zip), Fiji
+  opening the TIFF crops, the Autocropper and its splitting of touching
+  objects.
+- Tests: new ones for each of the above (zip bombs, other data types,
+  links in TIFF folders, the regions JSON, a dropped name with "&").
+
 ## 0.23.1 (2026-11-27, beta)
 
 The cover picture at the top of the README (the user's wish: on the

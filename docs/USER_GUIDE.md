@@ -1,6 +1,6 @@
 ---
 title: "Volume Cropper"
-subtitle: "User guide — version 0.23.1 (beta)"
+subtitle: "User guide — version 0.23.2 (beta)"
 author: "Designed and tested by Matthew Benton (EMBL). The code and this guide
   were written entirely by Claude Opus 5.5 (Anthropic), effort level “xhigh”,
   in Claude Code for Visual Studio Code, 21 October – 27 November 2026."
@@ -97,7 +97,8 @@ maintainer about problems and wishes.
    A **terminal window** opens first (when you double-click, a new black
    window; leave it open: it shows messages), then napari. You can also
    drop a `.zarr` folder onto `volume_cropper.bat` to open that image
-   straight away. For a desktop shortcut: right-click `volume_cropper.bat`
+   straight away (a folder whose name holds `&` arrives cut off at the
+   `&`: open such a folder with *Open…* instead). For a desktop shortcut: right-click `volume_cropper.bat`
    → *Show more options* → *Send to* → *Desktop (create shortcut)*.
 
 ## Mac

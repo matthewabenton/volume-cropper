@@ -1,11 +1,30 @@
 ---
-title: "Volume Cropper 0.23.1"
+title: "Volume Cropper 0.23.2"
 subtitle: "Patch notes: what is new since 0.8.1 (beta, 27 November 2026)"
 lang: en
 ---
 
 Everything here is explained in the user guide (`USER_GUIDE_<version>.pdf`). The
 full technical list is in `CHANGELOG.md`.
+
+# 0.23.2 (27 November 2026): the last review fixes
+
+Nothing changes in how you use the window: no new environment is
+needed, and the plugin keeps working without installing it again.
+
+- **Safer with files from elsewhere, continued:** a zipped OME-Zarr
+  made to fill the computer's memory when opened is refused; so is an
+  image whose data are not numbers, a folder of TIFFs with links to
+  files outside it, and saving regions over a file of another program.
+- **volume_cropper.bat:** dropping a folder whose name contains `&` onto
+  it can no longer make Windows run part of the name as a command. Such
+  a name arrives cut off at the `&`: open that folder with *Open…*.
+- **The notes for beta testers** (BETA_TESTING.pdf) are gone.
+- **NOT_YET_TESTED.pdf** lists what has been tested by people now (a
+  Mac, BARD, Windows, zipped OME-Zarr, Fiji opening the TIFFs, the
+  Autocropper and its splitting).
+- The user guide is now `USER_GUIDE_0232.pdf` (one sentence more, on
+  dropping folders).
 
 # 0.23.1 (27 November 2026): a cover picture
 

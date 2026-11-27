@@ -1014,6 +1014,34 @@ def test_what_to_load_and_a_drag_at_the_edge_keep_the_regions():
         _pump()
 
 
+def test_saving_regions_leaves_another_files_json_alone():
+    """(0.23.2, the pre-publication review) Saving regions with outlines per
+    timepoint writes <regions>_outlines_per_timepoint.json beside the CSV:
+    a file of that name that Volume Cropper did not write is not replaced
+    (nothing is written then); its own one is, as before."""
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        image, _ = make_image(tmp)
+        timed = {time: _rectangle_outlines(time)[0] for time in (0.0, 10.0)}
+        boxes = [vc.CropBox("moving", dict(RANGES), track=TRACK,
+                            timed_outlines=timed)]
+        sidecar = tmp / "regions_outlines_per_timepoint.json"
+        sidecar.write_text('{"notes": "someone else\'s"}', encoding="utf-8")
+        try:
+            vc.save_boxes_csv(boxes, tmp / "regions.csv", image)
+        except ValueError as err:
+            assert "not written by Volume Cropper" in str(err), err
+        else:
+            raise AssertionError("another file's JSON was replaced")
+        assert sidecar.read_text(encoding="utf-8") == \
+            '{"notes": "someone else\'s"}'
+        assert not (tmp / "regions.csv").exists()
+        sidecar.unlink()
+        vc.save_boxes_csv(boxes, tmp / "regions.csv", image)
+        vc.save_boxes_csv(boxes, tmp / "regions.csv", image)   # its own: fine
+        assert vc.load_boxes_csv(tmp / "regions.csv")[0].timed_outlines == timed
+
+
 if __name__ == "__main__":
     tests = [f for name, f in sorted(globals().items())
              if name.startswith("test_") and callable(f)]

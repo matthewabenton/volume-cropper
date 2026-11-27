@@ -462,10 +462,11 @@ The user's choices of 2026-11-06, one release each, in this order:
   rescales during a drag: the axis moving under the pointer would make the
   dragged line run away; `_refit` runs when a drag ends, from `on_display`
   (boxes, auto-contrast, napari) and `set_marker`, and only rebins when
-  `axis_range` changes (gamma alone does not). README.pdf and
-  BETA_TESTING.pdf have plain names (the user's choice: "GitHub style"),
-  so like PATCH_NOTES.pdf a release overwrites them: nobody may have them
-  open in the shared copy then. `tests/test_docs.py` keeps those two in step
+  `axis_range` changes (gamma alone does not). README.pdf has a plain
+  name (the user's choice: "GitHub style"), so like PATCH_NOTES.pdf a
+  release overwrites it: nobody may have it open in the shared copy
+  then (BETA_TESTING.pdf was another one, until 0.23.2). `tests/test_docs.py`
+  keeps README.pdf in step
   (fingerprints in `docs/pdf_sources.json`); the guide, PATCH_NOTES and
   NOT_YET_TESTED are still made before a release (`--check` lists them).
 
@@ -1088,11 +1089,27 @@ user's login). Rules to keep:
   control characters, no name starting with = + - @. **Regions CSV:**
   names that start like a formula are written with a leading '
   (`_csv_text`, read back by `_from_csv_text`).
-- Not changed (low; noted by the review): a path with "&" dropped onto
-  the .bat; `.part` files in an output folder others can write to; a
-  zip of compressed members (read whole); links inside image folders are
-  followed on Linux and Mac. Each crop records its source's full path
-  (provenance; the user's choice to keep it).
+- (0.23.2) **Zipped images:** a compressed file in the zip may unpack to
+  at most what its level's shard (or chunk) holds, twice, plus 1 MB, a
+  compressed metadata file to 64 MB (`ZIP_META_MAX_BYTES`,
+  `_check_zip_sizes`): zarr reads each file of a zip whole. **Numbers
+  only:** a level of any other data type is refused (zarr 3.4.1 refuses
+  pickled Python objects itself). **TIFF folders:** a file that is a
+  link to a file outside the folder is refused (`_links_outside`; only
+  links are resolved, so it costs nothing on Windows). **Regions JSON:**
+  a file of its name that the tool did not write is not replaced
+  (`_our_timed_outlines`). **volume_cropper.bat** ends through `:end`,
+  which ends the cmd.exe that started it with /c (double-click, drop):
+  a dropped name with "&" and no space reaches cmd.exe unquoted, and
+  cmd.exe would run the rest of the name as a command after the .bat
+  (`test_dropped_name_with_ampersand_runs_nothing`). Its check works on
+  a copy of cmdcmdline: a substitution on cmdcmdline itself changes it.
+- Not changed (low; noted by the review): `.part` files in an output
+  folder others can write to (a planted link could redirect a write;
+  Linux and Mac, where links need no rights); a folder disguised as one
+  of the tool's crops (needs write access to the output folder); links
+  inside OME-Zarr folders (followed, on Linux and Mac). Each crop
+  records its source's full path (provenance; the user's choice).
 
 ## napari internals used
 

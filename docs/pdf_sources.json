@@ -1,22 +1,18 @@
 {
   "README.md": {
     "pdf": "README.pdf",
-    "sha256": "1026cb908063e1b4e5543ab564c6a4989c95c52506ffda769b55fb183cadc451"
-  },
-  "docs/BETA_TESTING.md": {
-    "pdf": "docs/BETA_TESTING.pdf",
-    "sha256": "e685a1d9ec6f6cf82bd69d8f0bd4a3afa270199fd009aac2f1fa990d2cca601b"
+    "sha256": "63f44e59b248b4e2b21082c16e011b10725db3a212542fc859bdfe966b16abf7"
   },
   "docs/NOT_YET_TESTED.md": {
     "pdf": "docs/NOT_YET_TESTED.pdf",
-    "sha256": "f4dda74719fbeaa3e52935a05f119b1d0b7fef53788a821bc78cc12171c47064"
+    "sha256": "979bec96430138f71fd33b48f65f0e68a0ca0d30c25c376c6c89b72dc6ea0ae8"
   },
   "docs/PATCH_NOTES.md": {
     "pdf": "docs/PATCH_NOTES.pdf",
-    "sha256": "109a5078f721173ff41d19d598d40e3c1902f880bb5787f19b2fea1567337390"
+    "sha256": "5c6696ffa3cb0e745100b65baa04eb3848961aadfc6647ebebeb1eea2236b0c0"
   },
   "docs/USER_GUIDE.md": {
-    "pdf": "docs/USER_GUIDE_0231.pdf",
-    "sha256": "ac179a6eee95e0c819899c6fee41536200000ca921be263e404f0fc5407d81c3"
+    "pdf": "docs/USER_GUIDE_0232.pdf",
+    "sha256": "e408e058b1f365dde94f0f92049db428e9ca43356cdb79b8df926d6ba4a37b26"
   }
 }

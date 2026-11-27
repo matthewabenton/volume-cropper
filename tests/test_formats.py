@@ -331,6 +331,49 @@ def test_zipped_images_open_like_folders():
                 zipped.close()
 
 
+def test_zip_bombs_are_refused():
+    """(0.23.2, the pre-publication review) zarr reads each file of a zip
+    whole: a compressed file that unpacks to more than a level's shard (or
+    chunk) can hold, or a compressed metadata file over 64 MB, is refused
+    when the image is opened, before it is read. (A compressed zip whose
+    files are real, as Explorer makes them, opens: see the test above.)"""
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        folder = tmp / "img.zarr"
+        make_test_image(folder)
+        level = vc.open_image(folder).levels[0].array
+        block = level.shards or level.chunks
+        limit = 2 * int(np.prod(block)) * level.dtype.itemsize + 2**20
+        files = sorted(p for p in folder.rglob("*") if p.is_file())
+        data_file = next(p for p in files if p.relative_to(folder).parts[0]
+                         == "0" and p.name != "zarr.json")
+        for case, (bomb, size) in {
+                "data": (data_file, limit + 1),
+                "metadata": (folder / "zarr.json",
+                             vc.ZIP_META_MAX_BYTES + 1)}.items():
+            zipped = tmp / f"{case}.zip"
+            with zipfile.ZipFile(zipped, "w",
+                                 compression=zipfile.ZIP_DEFLATED) as zf:
+                for path in files:
+                    name = path.relative_to(folder).as_posix()
+                    if path == bomb:          # unpacks to `size` zero bytes
+                        zf.writestr(name, b"\0" * size)
+                        bomb_name = name
+                    else:
+                        zf.write(path, name)
+            with zipfile.ZipFile(zipped) as zf:      # tiny in the zip
+                info = zf.getinfo(bomb_name)
+                assert info.compress_size * 100 < info.file_size == size
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    vc.open_image(zipped).close()
+            except ValueError as err:
+                assert "would unpack to" in str(err), err
+            else:
+                raise AssertionError(f"the {case} zip bomb was opened")
+
+
 def test_zip_files_that_hold_no_image_are_refused():
     """Clear errors for a zip inside a zip (RFC-9 forbids it), a zip with
     no image, and a file that only has a zip's name."""

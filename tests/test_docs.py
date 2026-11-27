@@ -1,11 +1,10 @@
 """Tests that the PDFs for colleagues are in step with their Markdown
 (0.22.0, the user's wish: "always keep a PDF of the README for colleagues
-that don't know .md"; also BETA_TESTING.pdf).
+that don't know .md"; BETA_TESTING.pdf too until 0.23.2).
 
 Run with ``python run_all_tests.py docs`` (or this file alone; no napari,
 no pandoc needed). They check that:
-- README.pdf and docs/BETA_TESTING.pdf exist and were made from the
-  Markdown as it is now (docs/build_user_guide.py notes a fingerprint of
+- README.pdf exists and was made from the Markdown as it is now (docs/build_user_guide.py notes a fingerprint of
   each Markdown file it turns into a PDF, in docs/pdf_sources.json);
 - that bookkeeping notices a change: a Markdown file edited after its PDF
   was made is reported, and so is a missing PDF;
@@ -36,7 +35,6 @@ def _build_script():
 def test_pdfs_for_colleagues_in_step():
     build = _build_script()
     assert "README.md" in build.ALWAYS
-    assert "docs/BETA_TESTING.md" in build.ALWAYS
     problems = build.out_of_step(build.ALWAYS)
     assert not problems, (
         "\n".join(problems) + "\nMake them again: python "

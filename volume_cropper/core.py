@@ -87,7 +87,7 @@ from scipy.ndimage import (binary_dilation, binary_fill_holes,
 from skimage.draw import polygon2mask
 from skimage.measure import find_contours, points_in_poly
 
-__version__ = "0.23.1"
+__version__ = "0.23.2"
 
 # Tolerance for floating-point noise when converting physical units to voxel
 # indices (for example, 2.032 / 0.254 = 8.000000000000002).
@@ -448,6 +448,15 @@ def _open_in_group(group: zarr.Group, path: Path,
 ZIP_SUFFIXES = (".ozx", ".zip")
 # Zarr metadata files: v3 (zarr.json) and v2.
 _ZARR_META = ("zarr.json", ".zgroup", ".zattrs", ".zarray", ".zmetadata")
+# (0.23.2, the pre-publication review) zarr reads each file in a zip whole,
+# so a compressed file that unpacks to many GB (a "zip bomb") could fill
+# the computer's memory as soon as the image is opened or shown. A
+# compressed metadata file may unpack to at most this much; a compressed
+# file of a level's data to at most twice what one of its shards (or
+# chunks) holds, plus 1 MB (real ones stay far below: _check_zip_sizes).
+# Files stored uncompressed (as RFC-9 asks, and as the tool's own crops
+# are) take only their own size, so they are not limited.
+ZIP_META_MAX_BYTES = 64_000_000
 
 
 def is_zipped(path: str | Path) -> bool:
@@ -495,14 +504,20 @@ def _open_zip_group(path: Path):
     try:
         with zipfile.ZipFile(path) as zf:
             names = zf.namelist()
+            infos = zf.infolist()
             compressed = any(info.compress_type != zipfile.ZIP_STORED
-                             for info in zf.infolist()
+                             for info in infos
                              if not info.filename.endswith(_ZARR_META))
     except zipfile.BadZipFile as err:
         raise ValueError(
             f"{path.name} cannot be read as a zip file ({err}). It may be "
             "damaged, unfinished, or one part of a zip split into several "
             "files (RFC-9 does not allow that).") from err
+    for info in infos:                 # (before anything of it is read)
+        if info.compress_type != zipfile.ZIP_STORED \
+                and info.filename.endswith(_ZARR_META) \
+                and info.file_size > ZIP_META_MAX_BYTES:
+            _refuse_zip_member(path, info, ZIP_META_MAX_BYTES)
     root = _zip_root(path, names)
     store = ZipStore(path, mode="r")
     try:
@@ -525,11 +540,42 @@ def _open_zipped(path: Path, inner: str | None = None) -> OmeZarrImage:
     group, store, _, kind = _open_zip_group(path)
     try:
         image = _open_in_group(group, path, inner)
+        _check_zip_sizes(path, image)
     except Exception:
         store.close()
         raise
     image.container, image.store = kind, store
     return image
+
+
+def _refuse_zip_member(path: Path, info, limit: int) -> None:
+    raise ValueError(
+        f"{path.name}: the file {info.filename} in it would unpack to "
+        f"{format_bytes(info.file_size)}, more than it can hold as part of "
+        f"an image ({format_bytes(limit)}). Volume Cropper does not open "
+        "this zip: a file made that way could fill the computer's memory.")
+
+
+def _check_zip_sizes(path: Path, image: OmeZarrImage) -> None:
+    """Refuse a zipped image if a compressed file of one of its levels
+    would unpack to more than that level's data can hold (see
+    ZIP_META_MAX_BYTES)."""
+    import zipfile
+
+    limits = []
+    for level in image.levels:
+        array = level.array
+        block = array.shards or array.chunks
+        size = int(np.prod(block)) * np.dtype(array.dtype).itemsize
+        limits.append((array.path.rstrip("/") + "/", 2 * size + 2**20))
+    with zipfile.ZipFile(path) as zf:
+        for info in zf.infolist():
+            if info.compress_type == zipfile.ZIP_STORED:
+                continue
+            for prefix, limit in limits:
+                if info.filename.startswith(prefix) \
+                        and info.file_size > limit:
+                    _refuse_zip_member(path, info, limit)
 
 
 def zip_record(path: str | Path) -> dict | None:
@@ -776,8 +822,15 @@ def _image_from_group(group: zarr.Group, path: Path) -> OmeZarrImage:
             # (0.6 also allows "identity": a voxel size of 1)
             raise ValueError(f"{where} has no scale (voxel size) in the OME "
                              "metadata.")
-        levels.append(Level(dataset["path"], group[dataset["path"]],
-                            scale, translation))
+        array = group[dataset["path"]]
+        # (0.23.2, the pre-publication review) Numbers only: zarr 3.4.1
+        # refuses arrays of Python objects (stored with "pickle", which can
+        # run code when read), but the tool does not rely on that alone.
+        if np.dtype(array.dtype).kind not in "biuf":
+            raise ValueError(
+                f"{where} holds values of type {array.dtype}. Volume Cropper "
+                "opens images of numbers only (integers or floating point).")
+        levels.append(Level(dataset["path"], array, scale, translation))
     return OmeZarrImage(path, attrs, axes, levels)
 
 
@@ -4407,9 +4460,15 @@ def save_boxes_csv(boxes: list[CropBox], path: str | Path,
     if timed:
         columns.append("timed_outlines_file")
         sidecar = timed_outlines_path_for(path)
+        if sidecar.exists() and not _our_timed_outlines(sidecar):
+            raise ValueError(
+                f"{sidecar.name} exists and was not written by Volume "
+                "Cropper; saving these regions would replace it (it is where "
+                "their outlines per timepoint go). Move or rename it, or "
+                "save the regions under another name.")
         sidecar.write_text(json.dumps({
-            "description": "outlines per timepoint of the regions in "
-                           f"{Path(path).name} (Volume Cropper "
+            "description": _TIMED_OUTLINES_DESCRIPTION
+                           + f"{Path(path).name} (Volume Cropper "
                            f"{__version__}; µm)",
             "regions": {box.name: [
                 {"time": time, "outlines": _outline_records(outlines)}
@@ -4720,6 +4779,24 @@ def timed_outlines_path_for(csv_path: str | Path) -> Path:
     are too long for CSV cells: Excel cuts a cell at 32767 characters)."""
     csv_path = Path(csv_path)
     return csv_path.with_name(f"{csv_path.stem}_outlines_per_timepoint.json")
+
+
+# How save_boxes_csv's JSON of outlines per timepoint begins its description.
+_TIMED_OUTLINES_DESCRIPTION = "outlines per timepoint of the regions in "
+
+
+def _our_timed_outlines(path: Path) -> bool:
+    """Whether path is a JSON of outlines per timepoint that Volume Cropper
+    wrote (0.23.2: one that saving regions may replace; any other file of
+    that name is left alone)."""
+    try:
+        if path.stat().st_size > 1_000_000_000:
+            return False
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(data, dict) and str(data.get("description", "")) \
+        .startswith(_TIMED_OUTLINES_DESCRIPTION)
 
 
 def _polygon_record(key, points) -> dict:

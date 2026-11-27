@@ -14,6 +14,7 @@ rem "napari-env" (or set VOLUME_CROPPER_ENV to another environment name).
 rem The plugin is only installed into "volume_cropper" (or VOLUME_CROPPER_ENV).
 setlocal
 
+set "EXIT_CODE=0"
 set "MODE=gui"
 if /i "%~1"=="--install-plugin" set "MODE=install"
 if /i "%~1"=="--uninstall-plugin" set "MODE=uninstall"
@@ -26,7 +27,8 @@ for %%B in ("%VOLUME_CROPPER_CONDA%" "%LOCALAPPDATA%\miniforge3" "%USERPROFILE%\
 if not defined CONDA_BASE (
     echo Could not find conda. Install Miniforge, or set VOLUME_CROPPER_CONDA to its folder.
     pause
-    exit /b 1
+    set "EXIT_CODE=1"
+    goto :end
 )
 rem Use conda itself (condabin\conda.bat), never mamba: in newer Miniforge
 rem installs, Scripts\activate.bat runs "mamba activate", which fails when this
@@ -51,7 +53,8 @@ if defined ENV_NAME goto :activate
 echo The conda environment "volume_cropper" was not found. Create it first with:
 echo   conda env create -f "%~dp0env\environment.yml"
 pause
-exit /b 1
+set "EXIT_CODE=1"
+goto :end
 
 :activate
 call "%CONDA_BAT%" activate %ENV_NAME%
@@ -59,7 +62,8 @@ if errorlevel 1 (
     echo Could not activate the conda environment "%ENV_NAME%".
     echo Create it with: conda env create -f "%~dp0env\environment.yml"
     pause
-    exit /b 1
+    set "EXIT_CODE=1"
+    goto :end
 )
 
 rem (0.23.0) Python by its full path in the environment, below: cmd.exe
@@ -105,20 +109,23 @@ echo (or: volume_cropper.bat --napari). Then use Plugins ^> Volume Cropper,
 echo or Layers ^> Data ^> Crop selected layers. If %ENV_NAME% was already
 echo active in your terminal, type "conda activate %ENV_NAME%" once more.
 pause
-exit /b 0
+set "EXIT_CODE=0"
+goto :end
 
 :no_setuptools
 echo The environment %ENV_NAME% has no setuptools, which the install needs.
 echo Add it with:  conda install -n %ENV_NAME% -c conda-forge setuptools
 echo and then run this again.
 pause
-exit /b 1
+set "EXIT_CODE=1"
+goto :end
 
 :install_failed
 echo.
 echo The install failed (see the messages above).
 pause
-exit /b 1
+set "EXIT_CODE=1"
+goto :end
 
 :uninstall
 "%CONDA_PREFIX%\python.exe" -m pip uninstall -y --disable-pip-version-check napari-volume-cropper
@@ -127,7 +134,8 @@ echo.
 echo Done: Volume Cropper is no longer in napari's menus (after napari is
 echo started again). The tool itself still works as before.
 pause
-exit /b 0
+set "EXIT_CODE=0"
+goto :end
 
 :done
 rem Keep the window open if something went wrong, so the error can be read.
@@ -136,3 +144,19 @@ if not "%EXIT_CODE%"=="0" (
     echo Volume Cropper stopped with exit code %EXIT_CODE%.
     pause
 )
+
+:end
+rem (0.23.2) Started with "cmd.exe /c" (a double-click, a file dropped
+rem onto this one, another program): end that cmd.exe as well, not only
+rem this file. A dropped name that holds "&" but no space reaches
+rem cmd.exe unquoted, and cmd.exe would run the rest of the name as a
+rem command after this file (checked 2026-11-27). cmdcmdline is read
+rem with ! (delayed), which runs nothing in it, and into a copy: a
+rem substitution on cmdcmdline itself changes cmdcmdline. Its quotes
+rem are taken out of the copy before the comparison. From a terminal:
+rem back to the terminal, as before.
+setlocal EnableDelayedExpansion
+set "VC_LINE=!cmdcmdline!"
+set "VC_LINE=!VC_LINE:"=!"
+if /i not "!VC_LINE:/c =!"=="!VC_LINE!" exit %EXIT_CODE%
+endlocal & exit /b %EXIT_CODE%

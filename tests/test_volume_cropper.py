@@ -557,6 +557,28 @@ def test_axis_names_that_could_be_html_or_formulas_are_refused():
         assert vc.open_image(path).axis_names == ["c", "z", "y", "x"]
 
 
+def test_images_of_other_than_numbers_are_refused():
+    """(0.23.2, the pre-publication review) A level that holds anything but
+    numbers (here complex numbers) is refused when the image is opened.
+    (zarr 3.4.1 itself refuses arrays of Python objects stored with
+    "pickle", which could run code when read; the tool checks too.)"""
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "complex.zarr"
+        root = zarr.open_group(path, mode="w", zarr_format=3)
+        root.create_array("0", shape=(4, 6), chunks=(4, 6), dtype="complex64")
+        axes = [{"name": "y", "type": "space", "unit": "micrometer"},
+                {"name": "x", "type": "space", "unit": "micrometer"}]
+        root.attrs["ome"] = {"version": "0.5", "multiscales": [{
+            "axes": axes, "datasets": [{"path": "0", "coordinateTransformations": [
+                {"type": "scale", "scale": [1.0, 1.0]}]}]}]}
+        try:
+            vc.open_image(path)
+        except ValueError as err:
+            assert "numbers only" in str(err), err
+        else:
+            raise AssertionError("an image of complex numbers was opened")
+
+
 def test_csv_from_excel():
     """A file as Excel saves it in a German or French setup: semicolons,
     decimal commas, Windows text encoding, an empty row at the end."""

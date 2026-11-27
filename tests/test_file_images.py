@@ -972,6 +972,36 @@ def test_tiff_folder_reads_each_file_by_itself():
         assert not [p for p in opened if "outside" in p], opened
 
 
+def test_links_to_files_outside_a_tiff_folder_are_refused():
+    """(0.23.2, the pre-publication review) A folder of TIFFs whose files
+    include a link to a file outside the folder is refused (on Linux and
+    Mac anyone can make such links; reading them reads files elsewhere).
+    The check itself with a stand-in for resolving links; then a real link,
+    where this computer lets the test make one (on Windows that needs
+    Developer Mode or administrator rights)."""
+    folder = Path("stack")
+    fake = {str(folder): "/data/stack", str(folder / "a.tif"): "/data/stack/a.tif",
+            str(folder / "b.tif"): "/data/elsewhere/b.tif"}
+    assert fi._links_outside(folder, [folder / "a.tif", folder / "b.tif"],
+                             resolve=lambda p: fake[str(p)]) == ["b.tif"]
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        (tmp / "stack").mkdir()
+        (tmp / "outside").mkdir()
+        tifffile.imwrite(tmp / "stack" / "p01.tif", np.zeros((2, 2), np.uint16))
+        tifffile.imwrite(tmp / "outside" / "x.tif", np.ones((2, 2), np.uint16))
+        try:
+            os.symlink(tmp / "outside" / "x.tif", tmp / "stack" / "p02.tif")
+        except (OSError, NotImplementedError):
+            return                      # no links on this computer
+        try:
+            fi.open_file(tmp / "stack")
+        except ValueError as err:
+            assert "outside the folder" in str(err) and "p02.tif" in str(err)
+        else:
+            raise AssertionError("a folder with a link outside was opened")
+
+
 if __name__ == "__main__":
     import run_all_tests
     raise SystemExit(run_all_tests.run(["files"]))
