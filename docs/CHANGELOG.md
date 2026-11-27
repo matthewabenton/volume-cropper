@@ -3,6 +3,15 @@
 The crop code's version is recorded in each crop's provenance
 (`crop_provenance` in its `zarr.json`).
 
+## 0.23.1 (2026-11-27, beta)
+
+The cover picture at the top of the README (the user's wish: on the
+GitHub repository's front page) and of README.pdf:
+`docs/images/cover.png`, made by `dev/make_cover_image.py` from the
+synthetic demo only, now without metadata in the PNG (matplotlib wrote
+its name and version). The tool works exactly as 0.23.0; the guide is
+the same apart from its version line, now `USER_GUIDE_0231.pdf`.
+
 ## 0.23.0 (2026-11-27, beta)
 
 Ready to be public: the fixes of a pre-publication review (a crafted file

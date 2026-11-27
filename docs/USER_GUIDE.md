@@ -1,6 +1,6 @@
 ---
 title: "Volume Cropper"
-subtitle: "User guide — version 0.23.0 (beta)"
+subtitle: "User guide — version 0.23.1 (beta)"
 author: "Designed and tested by Matthew Benton (EMBL). The code and this guide
   were written entirely by Claude Opus 5.5 (Anthropic), effort level “xhigh”,
   in Claude Code for Visual Studio Code, 21 October – 27 November 2026."

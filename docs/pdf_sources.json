@@ -1,7 +1,7 @@
 {
   "README.md": {
     "pdf": "README.pdf",
-    "sha256": "4084166f58c246ffec21a111f3b5717b3afefe0465ea9b6a87a2e1136b534bd9"
+    "sha256": "1026cb908063e1b4e5543ab564c6a4989c95c52506ffda769b55fb183cadc451"
   },
   "docs/BETA_TESTING.md": {
     "pdf": "docs/BETA_TESTING.pdf",
@@ -13,10 +13,10 @@
   },
   "docs/PATCH_NOTES.md": {
     "pdf": "docs/PATCH_NOTES.pdf",
-    "sha256": "dd0f8eadd766e09a044b8c0c53015399bd40a0250e26516788b59f9aad963462"
+    "sha256": "109a5078f721173ff41d19d598d40e3c1902f880bb5787f19b2fea1567337390"
   },
   "docs/USER_GUIDE.md": {
-    "pdf": "docs/USER_GUIDE_0230.pdf",
-    "sha256": "11b7c0d8c430f2a80edf1f474daf8845603618896dabace09c12be9678959ccd"
+    "pdf": "docs/USER_GUIDE_0231.pdf",
+    "sha256": "ac179a6eee95e0c819899c6fee41536200000ca921be263e404f0fc5407d81c3"
   }
 }

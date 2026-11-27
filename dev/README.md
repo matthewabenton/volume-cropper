@@ -108,7 +108,9 @@ projections of level 1, half resolution) with crop regions as solid lines
 and silhouette polygons (traced from the demo's true labels) as dashed
 lines, and the crop's 3D preview at full resolution (level 0): the voxels
 the tool's `outline_mask` keeps, the others dimmed as in the window. Stops
-if the words would reach the pictures. No window.
+if the words would reach the pictures. No window. Its picture is also
+`docs/images/cover.png`, at the top of the README (0.23.1; the PNG holds
+no metadata): `python dev/make_cover_image.py docs/images/cover.png`.
 
 `bard_gl_check.sh`: which OpenGL route works on a BARD desktop.
 

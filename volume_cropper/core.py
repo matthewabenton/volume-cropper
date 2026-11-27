@@ -87,7 +87,7 @@ from scipy.ndimage import (binary_dilation, binary_fill_holes,
 from skimage.draw import polygon2mask
 from skimage.measure import find_contours, points_in_poly
 
-__version__ = "0.23.0"
+__version__ = "0.23.1"
 
 # Tolerance for floating-point noise when converting physical units to voxel
 # indices (for example, 2.032 / 0.254 = 8.000000000000002).

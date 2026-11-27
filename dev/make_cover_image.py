@@ -332,7 +332,9 @@ def main():
         sys.exit(f"STOP: the text reaches x = {widest:.0f} px, "
                  f"the pictures start at {x0:.0f}")
 
-    fig.savefig(OUT, dpi=100, facecolor=BG)
+    # (no "Software" text in the PNG: the repository's pictures carry no
+    # metadata)
+    fig.savefig(OUT, dpi=100, facecolor=BG, metadata={"Software": None})
     print(f"Wrote {OUT} ({OUT.stat().st_size / 1e3:.0f} kB)")
 
 

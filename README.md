@@ -1,5 +1,7 @@
 # Volume Cropper
 
+![Volume Cropper: draw regions at low resolution, save them at full resolution. The XY, YZ and XZ views of a synthetic demo image (embryo-like objects in tissue), with crop regions as solid lines and the polygon outlines of the selected one dashed, and that crop turned in 3D.](docs/images/cover.png)
+
 Crop boxes out of large OME-Zarr images (OME-Zarr 0.6, 0.5 or 0.4, e.g. from
 eubi-bridge; also zipped: .ozx, .zip) and save each box as a new OME-Zarr in
 the **same format**: the
@@ -8,7 +10,7 @@ levels (cut out level by level, not recomputed), the OME metadata, and a
 record of where the crop came from. It runs in napari, with four linked
 views (XY, YZ, XZ and 3D), and also as a notebook and on the command line.
 
-**Version 0.23.0 (beta)**, for testing within the group: what is new is in
+**Version 0.23.1 (beta)**, for testing within the group: what is new is in
 [PATCH_NOTES.pdf](docs/PATCH_NOTES.pdf), what could not be tested yet in
 [NOT_YET_TESTED.pdf](docs/NOT_YET_TESTED.pdf). Testers: please see
 [BETA_TESTING.pdf](docs/BETA_TESTING.pdf) for what is most useful to try and
@@ -16,7 +18,7 @@ report.
 
 ## Start here
 
-**Read [USER_GUIDE_0230.pdf](docs/USER_GUIDE_0230.pdf)**: installing it on Windows, Mac or
+**Read [USER_GUIDE_0231.pdf](docs/USER_GUIDE_0231.pdf)**: installing it on Windows, Mac or
 Linux (including BARD), a first crop in five minutes, every part of the
 window, large crops with the notebook or the command line, and what to do
 when something goes wrong.
@@ -73,7 +75,7 @@ opens in a window of its own and leaves yours as it is.
 | `napari_volume_cropper/`, `pyproject.toml` | the napari plugin (napari's manifest and the functions it calls) |
 | `env/environment.yml` | conda recipe with everything the tool needs, in tested versions |
 | `examples/volume_cropper.ipynb` | notebook for large crops (on a JupyterHub or a cluster node), with preview and checks |
-| `docs/` | the user guide (`USER_GUIDE_0230.pdf`, its source and build script), `CHANGELOG.md` (what changed in each version), `PATCH_NOTES.pdf` (what is new, for users), `NOT_YET_TESTED.pdf` (what could not be tested yet), `BETA_TESTING.pdf` (for beta testers); each PDF next to its Markdown source |
+| `docs/` | the user guide (`USER_GUIDE_0231.pdf`, its source and build script), `CHANGELOG.md` (what changed in each version), `PATCH_NOTES.pdf` (what is new, for users), `NOT_YET_TESTED.pdf` (what could not be tested yet), `BETA_TESTING.pdf` (for beta testers); each PDF next to its Markdown source |
 | `tests/` | the tests: `python tests/run_all_tests.py` runs them all |
 | `dev/` | for maintainers: `DEVELOPERS.md` (how the code is organised and tested, and the napari details it relies on) and the check scripts |
 

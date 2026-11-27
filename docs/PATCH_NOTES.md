@@ -1,11 +1,17 @@
 ---
-title: "Volume Cropper 0.23.0"
+title: "Volume Cropper 0.23.1"
 subtitle: "Patch notes: what is new since 0.8.1 (beta, 27 November 2026)"
 lang: en
 ---
 
 Everything here is explained in the user guide (`USER_GUIDE_<version>.pdf`). The
 full technical list is in `CHANGELOG.md`.
+
+# 0.23.1 (27 November 2026): a cover picture
+
+Nothing changes in the tool. The README (and README.pdf) now starts
+with a picture of what Volume Cropper does. The user guide is the same
+as for 0.23.0, now as `USER_GUIDE_0231.pdf`.
 
 # 0.23.0 (27 November 2026): safer with files from elsewhere
 
