@@ -1,0 +1,31 @@
+name: napari-volume-cropper
+display_name: Volume Cropper
+# What napari offers from this plugin (0.13.0). napari adds "(Volume
+# Cropper)" to each menu entry. Nothing is imported until one is used.
+contributions:
+  commands:
+    - id: napari-volume-cropper.panel
+      python_name: napari_volume_cropper._widget:VolumeCropperPanel
+      title: Volume Cropper panel
+    - id: napari-volume-cropper.crop_selected_layers
+      python_name: napari_volume_cropper._commands:crop_selected_layers
+      title: Crop selected layers…
+      enablement: num_selected_image_layers >= 1
+    - id: napari-volume-cropper.new_window
+      python_name: napari_volume_cropper._commands:open_in_new_window
+      title: Open in a new window
+    - id: napari-volume-cropper.make_demo
+      python_name: napari_volume_cropper._sample:make_demo
+      title: Load the synthetic Volume Cropper demo
+  widgets:
+    - command: napari-volume-cropper.panel
+      display_name: Volume Cropper
+  menus:
+    napari/layers/data:
+      - command: napari-volume-cropper.crop_selected_layers
+    napari/file/io_utilities:
+      - command: napari-volume-cropper.new_window
+  sample_data:
+    - command: napari-volume-cropper.make_demo
+      key: demo
+      display_name: Synthetic demo (3 channels, 64 x 256 x 256)

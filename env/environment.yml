@@ -1,0 +1,71 @@
+# volume_cropper: everything needed to run Volume Cropper
+# (napari GUI, notebook and command line), on Windows, Mac or BARD/cluster.
+# Step-by-step instructions: USER_GUIDE.md (or USER_GUIDE_<version>.pdf) in the tool folder.
+#
+# Versions are pinned to those the tool was tested with: the packages it
+# uses directly, and the parts of napari it relies on (Qt, vispy, superqt
+# and others), so that everyone gets the same behaviour, also when
+# installing weeks apart. Packages come from conda-forge only
+# ("nodefaults"), also for Anaconda users. Checked for version 0.20.0 on
+# 2026-11-17: solves for Windows, Linux (glibc 2.28 or newer) and Macs
+# with macOS 11 or newer (Apple Silicon and Intel; Qt 6.8 needs macOS 11),
+# and a fresh environment made from this file on Windows passes all tests.
+# (The pins are those of 0.17.0: an environment made or updated since then
+# needs no update.)
+#
+# Create the environment (once):
+#   Windows: open a "Miniforge Prompt" (or "Anaconda Prompt") and type
+#     conda env create -f "<tool folder>\env\environment.yml"
+#   Mac: in Terminal type
+#     conda env create -f "<tool folder>/env/environment.yml"
+#   Linux, BARD / cluster: in a terminal type
+#     source ~/miniforge3/etc/profile.d/conda.sh
+#     conda env create -f "<tool folder>/env/environment.yml"
+#   (<tool folder> = the folder with volume_cropper.bat and this env folder.)
+#
+# For the notebook on the JupyterHub, also register the environment as a
+# kernel (once):
+#   conda activate volume_cropper
+#   python -m ipykernel install --user --name volume_cropper --display-name "Python (volume_cropper)"
+name: volume_cropper
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.14.8
+  - napari=0.9.2            # the viewer (the tool relies on its details)
+  - pyqt6=6.8.1             # Qt binding for napari's windows
+  - qt6-main=6.8            # Qt itself (any 6.8: 6.8.4 needs macOS 13.3+)
+  - vispy=0.17.0            # napari's drawing (OpenGL)
+  - superqt=0.8.2           # napari's Qt helpers (background threads)
+  - qtpy=2.4.3
+  - psygnal=0.16.1          # napari's events
+  - app-model=0.5.1
+  - magicgui=0.10.2
+  - pydantic=2.12.5
+  - pyopengl=3.1.10
+  - psutil=7.2.2            # memory in use
+  - napari-ome-zarr=0.11.0
+  - zarr=3.4.1              # reading/writing OME-Zarr (Zarr v3)
+  - numcodecs=0.17.0        # compression
+  - numpy=2.5.4
+  - dask-core=2026.8.0      # lazy loading of large images
+  - ome-zarr=0.21.0
+  - tifffile=2026.9.20      # TIFF export for Fiji (0.10.0; napari needs it too)
+  - scikit-image=0.26.0     # outlines (polygon masks, contours), the
+                            # Autocropper (thresholds, split), 3D surfaces
+  - scipy=1.18.1            # outlines between slices (distance maps,
+                            # interpolation), Autocropper, tile stitching
+  - matplotlib-base=3.11.2  # the Levels histogram (0.18.0), notebook previews
+  - tqdm=4.70.1             # notebook progress bars
+  - ipykernel=6.31.0        # Jupyter kernel
+  - setuptools=84.0.0       # installing the napari plugin (0.13.0; already
+                            # comes with Qt's sip, pinned to be explicit)
+  # Microscope files (0.15.0): Leica LIF, Zeiss CZI, Nikon ND2, Olympus OIR.
+  # An environment made before 0.15.0 gets them with:
+  #   conda env update -n volume_cropper -f <tool folder>/env/environment.yml
+  - liffile=2026.10.14
+  - czifile=2026.10.14
+  - imagecodecs=2026.8.16   # CZI decompression (zstd, JPEG XR ...)
+  - nd2=0.12.0
+  - oirfile=2026.10.22

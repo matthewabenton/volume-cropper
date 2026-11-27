@@ -1,0 +1,44 @@
+/* Style of the user guide (HTML and the PDF printed from it). */
+@page {
+  size: A4;
+  margin: 18mm 17mm 20mm 17mm;
+  @bottom-center { content: counter(page); font: 9pt "Segoe UI", Helvetica, Arial, sans-serif; color: #777; }
+}
+html { font-size: 10.5pt; }
+body {
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  color: #222;
+  line-height: 1.45;
+  max-width: 50em;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+header#title-block-header { text-align: center; margin: 4em 0 2.5em; }
+h1.title { font-size: 2.6em; color: #1d4e89; margin-bottom: 0.2em; }
+p.subtitle { font-size: 1.15em; color: #555; margin-top: 0; }
+p.author { font-size: 0.9em; font-style: italic; color: #555;
+  max-width: 34em; margin: 1.5em auto 0; }
+nav#TOC { page-break-after: always; }
+nav#TOC > ul { list-style: none; padding-left: 0; }
+nav#TOC li { margin: 0.15em 0; }
+nav#TOC ul ul { list-style: none; padding-left: 1.4em; font-size: 0.95em; }
+nav#TOC a { color: #1d4e89; text-decoration: none; }
+h1 { font-size: 1.6em; color: #1d4e89; border-bottom: 2px solid #1d4e89;
+     padding-bottom: 0.15em; margin-top: 1.8em; page-break-after: avoid; }
+h2 { font-size: 1.25em; color: #1d4e89; margin-top: 1.4em; page-break-after: avoid; }
+h3 { font-size: 1.05em; page-break-after: avoid; }
+a { color: #1d4e89; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 0.92em;
+       background: #f1f3f5; padding: 0.05em 0.25em; border-radius: 3px; }
+pre { background: #f1f3f5; padding: 0.6em 0.8em; border-radius: 4px;
+      overflow-x: auto; page-break-inside: avoid; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 0.8em 0;
+        page-break-inside: avoid; font-size: 0.95em; }
+th, td { border: 1px solid #c8cdd2; padding: 0.35em 0.5em; vertical-align: top;
+         text-align: left; }
+th { background: #e8eef5; }
+figure { margin: 1em 0; text-align: center; page-break-inside: avoid; }
+figure img, p img { max-width: 100%; border: 1px solid #ccc; }
+figcaption { font-size: 0.9em; color: #555; margin-top: 0.3em; }
+li { margin: 0.2em 0; }

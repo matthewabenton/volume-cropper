@@ -1,0 +1,22 @@
+{
+  "README.md": {
+    "pdf": "README.pdf",
+    "sha256": "4084166f58c246ffec21a111f3b5717b3afefe0465ea9b6a87a2e1136b534bd9"
+  },
+  "docs/BETA_TESTING.md": {
+    "pdf": "docs/BETA_TESTING.pdf",
+    "sha256": "e685a1d9ec6f6cf82bd69d8f0bd4a3afa270199fd009aac2f1fa990d2cca601b"
+  },
+  "docs/NOT_YET_TESTED.md": {
+    "pdf": "docs/NOT_YET_TESTED.pdf",
+    "sha256": "f4dda74719fbeaa3e52935a05f119b1d0b7fef53788a821bc78cc12171c47064"
+  },
+  "docs/PATCH_NOTES.md": {
+    "pdf": "docs/PATCH_NOTES.pdf",
+    "sha256": "dd0f8eadd766e09a044b8c0c53015399bd40a0250e26516788b59f9aad963462"
+  },
+  "docs/USER_GUIDE.md": {
+    "pdf": "docs/USER_GUIDE_0230.pdf",
+    "sha256": "11b7c0d8c430f2a80edf1f474daf8845603618896dabace09c12be9678959ccd"
+  }
+}

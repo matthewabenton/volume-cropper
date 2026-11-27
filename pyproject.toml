@@ -1,0 +1,60 @@
+# Volume Cropper as a napari plugin (0.13.0). Licence: BSD-3-Clause (LICENSE).
+#
+# Only the small package napari_volume_cropper is installed: napari's
+# manifest (napari.yaml) and the functions napari calls. The tool's own
+# package volume_cropper/ stays in this folder and is imported from here
+# when the plugin is first used (napari_volume_cropper/_tool.py), as the
+# launchers, the notebook and the command line do.
+#
+# Install it with the launcher, which uses the right conda environment and
+# writes nothing into this folder:
+#     volume_cropper.bat --install-plugin          (Windows)
+#     bash volume_cropper.sh --install-plugin      (Mac, Linux, BARD)
+# It runs, in the "volume_cropper" environment:
+#     python -m pip install --no-deps --no-build-isolation --no-index -e <this folder>
+# "Editable" (-e): the environment points to this folder, so a new release
+# here reaches the plugin without installing again. --no-build-isolation:
+# use the environment's setuptools (otherwise pip downloads it and writes
+# napari_volume_cropper.egg-info into this folder).
+#
+# "Private :: Do Not Upload" makes PyPI refuse an accidental upload (the
+# tool is shared as a folder, not as a PyPI package).
+# license = "BSD-3-Clause" (an SPDX expression) needs setuptools 77 or later;
+# env/environment.yml pins 84.
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "napari-volume-cropper"
+dynamic = ["version"]
+description = "Crop sub-volumes out of large OME-Zarr (and TIFF) images and napari layers, with four linked views"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+maintainers = [{ name = "Matthew Benton" }]
+requires-python = ">=3.11"
+# The environment provides everything (env/environment.yml pins it).
+dependencies = []
+classifiers = [
+    "Framework :: napari",
+    "Private :: Do Not Upload",
+]
+
+[project.entry-points."napari.manifest"]
+napari-volume-cropper = "napari_volume_cropper:napari.yaml"
+
+[tool.setuptools]
+# Only the plugin package: the tool's modules are not installed (see above).
+packages = ["napari_volume_cropper"]
+py-modules = []
+
+[tool.setuptools.package-data]
+napari_volume_cropper = ["napari.yaml"]
+
+[tool.setuptools.dynamic]
+# Read from the file (not imported); fixed at install time, so napari's
+# plugin list may show an older number after a release. The panel shows
+# the current one.
+version = {attr = "volume_cropper.core.__version__"}
